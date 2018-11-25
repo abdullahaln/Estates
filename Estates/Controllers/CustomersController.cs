@@ -65,16 +65,16 @@ namespace Estates.Controllers
             name = name.Trim();
 
             var customersList = db.People.OfType<Customer>().Where(c => c.FirstName.Contains(name)).ToList();
-            
+
             //var customers = from customer in customersList
             //                where customer.FirstName.Contains(name) || customer.LastName.Contains(name)
             //                select customer; 
 
-            
+
             return Ok(new
             {
                 message = "Customer has been recived",
-                totalResut = customersList.Count(),
+                totalResult = customersList.Count(),
                 result = customersList
             });
         }
@@ -84,7 +84,7 @@ namespace Estates.Controllers
         [Route("AddNewCustomer")]
         public IHttpActionResult AddNewCustomer(CustomerViewModel model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 // Get the ip address 
                 string ip = HttpContext.Current.Request.UserHostAddress;
@@ -110,6 +110,41 @@ namespace Estates.Controllers
 
             return BadRequest("Some properites are not vaild");
 
+        }
+        //PUT: api/Customers/EditCustomer
+        [HttpPut]
+        [Route("EditCustomer")]
+        public IHttpActionResult EditCustomer(Customer model)
+        {
+            //Get Customer for modification
+            var oldCustomer = db.People.Find(model.Id) as Customer;
+
+            //If Customer doesn't exist
+            if (oldCustomer == null)
+                return NotFound();
+
+            //Checking Database constraints on the given model
+            if (ModelState.IsValid)
+            {
+                string ip = HttpContext.Current.Request.UserHostAddress;
+
+                //Modifiy the data
+                oldCustomer.Address = model.Address.Trim();
+                oldCustomer.Email = model.Email.Trim();
+                oldCustomer.FirstName = model.FirstName.Trim();
+                oldCustomer.IpAddress = ip;
+                oldCustomer.LastName = model.LastName.Trim();
+                oldCustomer.Phone = model.Phone;
+
+                db.SaveChanges();
+
+                return Ok(new
+                {
+                    message = "Customer has been edited successfully!",
+                    status = "success"
+                });
+            }   
+            return BadRequest("Some properties are invalid!");
         }
 
         [HttpDelete]

@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Estates.Models
 {
-    abstract class Person
+    public abstract class Person
     {
         [Required, StringLength(40)]
         public string Id { get; set; }

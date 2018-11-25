@@ -18,13 +18,13 @@ namespace Estates.Controllers
         [HttpGet]
         public IHttpActionResult GetAllEstatesType()
         {
-            var T = db.EstatesTypes.ToList();
+            var types = db.EstatesTypes.ToList();
             return Ok(new
             {
                 message = "EstatesType have been recived successfully",
-                totalResult = T.Count(),
-                result = T
-
+                totalResult = types.Count(),
+                result = types,
+                status = "success"
             });
         }
 
@@ -37,6 +37,7 @@ namespace Estates.Controllers
                 return BadRequest("Please enter a valid ID");
 
             var type = db.EstatesTypes.Find(id);
+
             if (type == null)
                 return NotFound();
 
@@ -63,7 +64,7 @@ namespace Estates.Controllers
             if (types == null)
                 return BadRequest("This Types of Estate's is allredy faound");
 
-            
+
 
             if (ModelState.IsValid)
             {
@@ -87,12 +88,36 @@ namespace Estates.Controllers
 
             return BadRequest("Some properties are not valid");
         }
+        //PUT: api/EstatesType/EditEstateType
+        //Update EstateType
+        [HttpPut]
+        [Route("EditEstateType")]
+        public IHttpActionResult EditEstatesType(EstatesType model)
+        {
+            var oldType = db.EstatesTypes.Find(model.EstatesTypeId);
 
-        //GET: api/EstatesType/DeleteEstatesType
+            if (oldType == null)
+                return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                oldType.EstatesTypeName = model.EstatesTypeName.Trim();
+                db.SaveChanges();
+
+                return Ok(new
+                {
+                    message = "Estate Type has been updated!",
+                    status = "success"
+                });
+            }
+
+            return BadRequest("Some Properties are not valid!");
+        }
+        //DELETE: api/EstatesType/DeleteEstatesType
         //Delete all child
         [Route("DeleteEstatesType")]
         [HttpDelete]
-        public  IHttpActionResult DeleteEstatesType(string id)
+        public IHttpActionResult DeleteEstatesType(string id)
         {
             if (id == null)
                 return BadRequest("Please Enter a valid Value");
@@ -105,7 +130,8 @@ namespace Estates.Controllers
             db.EstatesTypes.Remove(estatesType);
             db.SaveChanges();
 
-            return Ok(new {
+            return Ok(new
+            {
                 message = "EstateType has removed successfully",
                 status = "success"
 

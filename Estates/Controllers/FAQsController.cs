@@ -60,7 +60,34 @@ namespace Estates.Controllers
 
             return BadRequest("Some properties are not vaild");
         }
+        //UPDATE: api/Faqs/EditFaq
+        //Edit a specific Faq
+        [HttpPut]
+        [Route("EditFaq")]
+        public IHttpActionResult EditFaq(FAQ model)
+        {
+            var oldFaq = db.FAQs.Find(model.FAQId);
 
+            if (oldFaq == null)
+                return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                oldFaq.Question = model.Question.Trim();
+                oldFaq.Answer = model.Answer.Trim();
+                oldFaq.UserId = model.UserId.Trim();
+
+                db.SaveChanges();
+
+                return Ok(new
+                {
+                    message = "Faq has been updated successfully!",
+                    status = "success"
+                });
+            }
+
+            return BadRequest("Some Properties are not valid");
+        }
         //DELETE: api/Faqs/RemoveFaq?id=0
         [Route("RemoveFaq")]
         [HttpDelete]

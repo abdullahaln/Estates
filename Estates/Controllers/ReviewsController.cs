@@ -72,7 +72,8 @@ namespace Estates.Controllers
                     review.ReviewDate,
                     review.Titel,
                     review.Value
-                }
+                },
+                status = "success"
             });
         }
 
@@ -113,7 +114,64 @@ namespace Estates.Controllers
 
             //There are some properties are not vaild
             return BadRequest("Some properties are not vaild");
+        }
 
+        //UPDATE: api/Reviews/EditReview
+        //Edits a review
+        [HttpPut]
+        [Route("EditReview")]
+        public IHttpActionResult EditReview(Review model)
+        {
+            var review = db.Reviews.Find(model.ReviewId);
+
+            if (review == null)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                string ip = HttpContext.Current.Request.UserHostAddress;
+
+                review.Description = model.Description.Trim();
+                review.IpAddress = ip;
+                review.NickName = model.NickName.Trim();
+                review.Titel = model.Titel.Trim();
+                review.Value = model.Value;
+
+                db.SaveChanges();
+
+                return Ok(new
+                {
+                    message = "review has been edited successfully",
+                    status = "success"
+                });
+            }
+
+            return BadRequest("Some properties are not valid");
+        }
+
+        //DELETE: api/Reviews/DeleteReview
+        //Deletes a review
+        [HttpDelete]
+        [Route("DeleteReview")]
+        public IHttpActionResult DeleteReview(string id)
+        {
+            var review = db.Reviews.Find(id);
+
+            if (review == null)
+            {
+                return NotFound();
+            }
+
+            db.Reviews.Remove(review);
+            db.SaveChanges();
+
+            return Ok(new
+            {
+                message = "review has been deleted successfully",
+                status = "success"
+            }); 
         }
     }
 }
