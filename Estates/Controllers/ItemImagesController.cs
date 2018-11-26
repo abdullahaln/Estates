@@ -13,6 +13,8 @@ namespace Estates.Controllers
     {
         ApplicationDbContext db = new ApplicationDbContext();
 
+        #region GET
+
         //GET: api/ItemImages
         //Gets all images for a specific item
         [HttpGet]
@@ -24,16 +26,22 @@ namespace Estates.Controllers
 
             if (item == null)
                 return NotFound();
+
             //Get the images for this item
             var images = db.ItemImages.Where(i => i.ItemId == id).ToList();
 
             return Ok(new
             {
-                message = "Images have been recieved successfully",
-                resultCount = images.Count,
-                result = images
+                Message = "Images have been recieved successfully",
+                ResultsCount = images.Count,
+                Result = images
             }); 
         }
+
+        #endregion
+
+        #region POST
+
         //POST: api/ItemImages
         //Inserts an image to a specific item
         [HttpPost]
@@ -57,16 +65,20 @@ namespace Estates.Controllers
 
                 return Ok(new
                 {
-                    message = "Image has been added successfully!",
-                    status = "success",
-                    result = model
+                    Message = "Image has been added successfully!",
+                    Status = "success",
+                    Result = model
                 });
             }
             return BadRequest("Some properties are not valid");
         }
 
+        #endregion
+
+        #region DELETE
+
         //DELETE: api/ItemImages
-        //Delete an item image
+        //Deletes an item image
         [HttpDelete]
         [Route("DeleteImage")]
         public IHttpActionResult DeleteImage(string id)
@@ -81,10 +93,12 @@ namespace Estates.Controllers
 
             return Ok(new
             {
-                message = "image has been deleted succesfully!",
-                status = "success",
-                result = oldImage
+                Message = "Image has been deleted succesfully!",
+                Status = "success",
+                Result = oldImage
             });
         }
+
+        #endregion
     }
 }

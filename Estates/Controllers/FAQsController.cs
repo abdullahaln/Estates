@@ -13,7 +13,10 @@ namespace Estates.Controllers
     {
         ApplicationDbContext db = new ApplicationDbContext();
 
+        #region GET
+
         //GET: api/Faqs/GetAllFaqs
+        //Gets all FAQS
         [Route("GetAllFaqs")]
         [HttpGet]
         public IHttpActionResult GetAllFaqs()
@@ -24,15 +27,21 @@ namespace Estates.Controllers
                 f.FAQId,
                 f.Question
             }).ToList();
+
             return Ok(new
             {
-                message = "FAQs have been recived successfully",
-                totalResult = faqs.Count(),
-                result = faqs
+                Message = "FAQs have been received successfully",
+                ResultsCount = faqs.Count,
+                Result = faqs
             });
         }
 
+        #endregion
+
+        #region POST
+
         //POST: api/Faqs/AddNewFaq
+        //Adds a FAQ
         [Route("AddNewFaq")]
         [HttpPost]
         public IHttpActionResult AddNewFaq(FAQSViewModel model)
@@ -52,16 +61,21 @@ namespace Estates.Controllers
 
                 return Ok(new
                 {
-                    message = "FAQ has been added successfully",
-                    totalResult = 1,
-                    result = faq
+                    Message = "FAQ has been added successfully",
+                    TotalResult = 1,
+                    Result = faq
                 });
             }
 
             return BadRequest("Some properties are not vaild");
         }
+
+        #endregion
+
+        #region PUT
+
         //UPDATE: api/Faqs/EditFaq
-        //Edit a specific Faq
+        //Edits a specific Faq
         [HttpPut]
         [Route("EditFaq")]
         public IHttpActionResult EditFaq(FAQ model)
@@ -81,14 +95,20 @@ namespace Estates.Controllers
 
                 return Ok(new
                 {
-                    message = "Faq has been updated successfully!",
-                    status = "success"
+                    Message = "Faq has been updated successfully!",
+                    Status = "success"
                 });
             }
 
             return BadRequest("Some Properties are not valid");
         }
+
+        #endregion
+
+        #region DELETE
+
         //DELETE: api/Faqs/RemoveFaq?id=0
+        //Deletes a FAQ by id
         [Route("RemoveFaq")]
         [HttpDelete]
         public IHttpActionResult RemoveFaq(string id)
@@ -103,9 +123,11 @@ namespace Estates.Controllers
 
             return Ok(new
             {
-                message = "Faq has been removied successfully",
-                status = "Success"
+                Message = "Faq has been removed successfully",
+                Status = "Success"
             });
         }
+
+        #endregion
     }
 }

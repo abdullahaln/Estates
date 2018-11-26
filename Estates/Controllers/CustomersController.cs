@@ -15,8 +15,10 @@ namespace Estates.Controllers
     {
         ApplicationDbContext db = new ApplicationDbContext();
 
+        #region GET
 
         //GET: api/Customers/GetAllCustomers
+        //Get all customers
         [HttpGet]
         [Route("GetAllCustomers")]
         public IHttpActionResult GetAllCustomers()
@@ -25,15 +27,15 @@ namespace Estates.Controllers
 
             return Ok(new
             {
-                message = "Customers have been recived",
-                totalResult = customers.Count(),
-                result = customers
+                Message = "Customers have been recived succesfully",
+                ResultsCount = customers.Count,
+                Result = customers,
+                Status = "success"
             });
         }
 
-
-
         //GET: api/Customers/GetCustomers?id=0
+        //Get customer by id
         [HttpGet]
         [Route("GetCustomer")]
         public IHttpActionResult GetCustomer(string id)
@@ -48,13 +50,14 @@ namespace Estates.Controllers
 
             return Ok(new
             {
-                message = "Customer has been recived",
-                result = customer,
-                status = "success"
+                Message = "Customer has been recived",
+                Result = customer,
+                Status = "success"
             });
         }
 
         //GET: api/Customers/SearchCustomers
+        //Get customers according to an input
         [HttpGet]
         [Route("SearchCustomers")]
         public IHttpActionResult SearchCustomers(string name)
@@ -73,11 +76,15 @@ namespace Estates.Controllers
 
             return Ok(new
             {
-                message = "Customer has been recived",
-                totalResult = customersList.Count(),
+                Message = "Customer has been recived",
+                ResultsCount = customersList.Count(),
                 result = customersList
             });
         }
+
+        #endregion
+
+        #region POST
 
         //POST: api/Customers/AddNewCustomer
         [HttpPost]
@@ -88,30 +95,39 @@ namespace Estates.Controllers
             {
                 // Get the ip address 
                 string ip = HttpContext.Current.Request.UserHostAddress;
-                Customer customer = new Customer();
-                customer.Address = model.Address.Trim();
-                customer.Email = model.Email.Trim();
-                customer.FirstName = model.FirstName.Trim();
-                customer.LastName = model.LastName.Trim();
-                customer.Id = Guid.NewGuid().ToString();
-                customer.Phone = model.phone.Trim();
-                customer.IpAddress = ip;
+
+                Customer customer = new Customer
+                {
+                    Address = model.Address.Trim(),
+                    Email = model.Email.Trim(),
+                    FirstName = model.FirstName.Trim(),
+                    LastName = model.LastName.Trim(),
+                    Id = Guid.NewGuid().ToString(),
+                    Phone = model.phone.Trim(),
+                    IpAddress = ip
+                };
+
 
                 db.People.Add(customer);
                 db.SaveChanges();
 
                 return Ok(new
                 {
-                    message = "Customer has been added successfully",
-                    result = customer,
-                    status = "success"
+                    Message = "Customer has been added successfully",
+                    Result = customer,
+                    Status = "success"
                 });
             }
 
             return BadRequest("Some properites are not vaild");
-
         }
+
+        #endregion
+
+        #region PUT
+
         //PUT: api/Customers/EditCustomer
+        //Edits a specific customer
         [HttpPut]
         [Route("EditCustomer")]
         public IHttpActionResult EditCustomer(Customer model)
@@ -126,6 +142,7 @@ namespace Estates.Controllers
             //Checking Database constraints on the given model
             if (ModelState.IsValid)
             {
+                //Get the ip address of the current user
                 string ip = HttpContext.Current.Request.UserHostAddress;
 
                 //Modifiy the data
@@ -135,17 +152,22 @@ namespace Estates.Controllers
                 oldCustomer.IpAddress = ip;
                 oldCustomer.LastName = model.LastName.Trim();
                 oldCustomer.Phone = model.Phone;
-
+                
                 db.SaveChanges();
 
                 return Ok(new
                 {
-                    message = "Customer has been edited successfully!",
-                    status = "success"
+                    Message = "Customer has been edited successfully!",
+                    Status = "success"
                 });
-            }   
+            }
+
             return BadRequest("Some properties are invalid!");
         }
+
+        #endregion
+
+        #region DELETE
 
         [HttpDelete]
         [Route("RemoveCustomer")]
@@ -169,5 +191,6 @@ namespace Estates.Controllers
             });
         }
 
+        #endregion
     }
 }

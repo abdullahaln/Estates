@@ -14,7 +14,10 @@ namespace Estates.Controllers
     {
         ApplicationDbContext db = new ApplicationDbContext();
 
+        #region GET
+
         //GET: api/reviews/GetAllReviews
+        //Gets all reviews
         [Route("GetAllReviews")]
         [HttpGet]
         public IHttpActionResult GetAllReviews()
@@ -22,13 +25,14 @@ namespace Estates.Controllers
             var reviews = db.Reviews.ToList();
             return Ok(new
             {
-                message = "Reviews have recived successfully",
-                totalResult = reviews.Count(),
-                result = reviews
+                Message = "Reviews have recived successfully",
+                ResultsCount = reviews.Count,
+                Result = reviews
             });
         }
 
         //GET: api/reviews/GetReviewById
+        //Gets a review by id
         [Route("GetReviewById")]
         [HttpGet]
         public IHttpActionResult GetReviewById(string id)
@@ -43,44 +47,40 @@ namespace Estates.Controllers
 
             return Ok(new
             {
-                message = "Review have been Found successfully",
-                result = review
+                Message = "Review have been Found successfully",
+                Result = review
             });
         }
 
         //GET: api/reviews/GetReviewByName
-        [Route("GetReviewByName")]
+        //Gets reviews according to the nickname
+        [Route("GetReviewsByName")]
         [HttpGet]
-        public IHttpActionResult GetReviewByName(string name)
+        public IHttpActionResult GetReviewsByName(string name)
         {
             if (name == null)
                 return BadRequest("Please enter valid ID");
 
-            var review = db.Reviews.Find(name);
+            var reviews = db.Reviews.Where(r => r.NickName == name).ToList();
 
-            if (review == null)
+            if (reviews == null)
                 return NotFound();
 
             return Ok(new
             {
-                message = "Review have been Found successfully",
-                result = new
-                {
-                    review.Description,
-                    review.NickName,
-                    review.Person.FullName,
-                    review.ReviewDate,
-                    review.Titel,
-                    review.Value
-                },
-                status = "success"
+                Message = "Review have been Found successfully",
+                Result = reviews,
+                Status = "success"
             });
         }
 
+        #endregion
+
+        #region POST
+
         //POST: api/reviews/AddNewReview
-        [Route("AddNewReview")]
         [HttpPost]
-        //We have a method 
+        [Route("AddNewReview")]
         public IHttpActionResult AddNewReview(ReviewViewModel model)
         {
             var person = db.People.Find(model.PersonId);
@@ -97,7 +97,6 @@ namespace Estates.Controllers
                 review.Description = model.Description.Trim();
                 review.ReviewDate = DateTime.UtcNow;
                 review.ReviewId = Guid.NewGuid().ToString();
-                string PersonName = person.FullName;
                 review.IpAddress = ip;
                 review.Value = (review.Value + model.Value) / (db.Reviews.Count() + 1);
 
@@ -106,15 +105,19 @@ namespace Estates.Controllers
 
                 return Ok(new
                 {
-                    message = "Review has been added successfully",
-                    totalResult = 1,
-                    result = review
+                    Message = "Review has been added successfully",
+                    ResultsCount = 1,
+                    Result = review
                 });
             }
 
             //There are some properties are not vaild
             return BadRequest("Some properties are not vaild");
         }
+
+        #endregion
+
+        #region PUT
 
         //UPDATE: api/Reviews/EditReview
         //Edits a review
@@ -143,13 +146,17 @@ namespace Estates.Controllers
 
                 return Ok(new
                 {
-                    message = "review has been edited successfully",
-                    status = "success"
+                    Message = "Review has been edited successfully",
+                    Status = "success"
                 });
             }
 
             return BadRequest("Some properties are not valid");
         }
+
+        #endregion
+
+        #region DELETE
 
         //DELETE: api/Reviews/DeleteReview
         //Deletes a review
@@ -169,9 +176,11 @@ namespace Estates.Controllers
 
             return Ok(new
             {
-                message = "review has been deleted successfully",
-                status = "success"
+                Message = "Review has been deleted successfully",
+                Status = "success"
             }); 
         }
+
+        #endregion
     }
 }

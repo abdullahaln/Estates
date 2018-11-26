@@ -13,28 +13,33 @@ namespace Estates.Controllers
     {
         ApplicationDbContext db = new ApplicationDbContext();
 
+        #region GET
+
         //GET: api/EstatesType/GetAllEstatesType
-        [Route("GetAllEstatesType")]
+        //Gets all the estate types
+        [Route("GetAllEstatesTypes")]
         [HttpGet]
-        public IHttpActionResult GetAllEstatesType()
+        public IHttpActionResult GetAllEstatesTypes()
         {
             var types = db.EstatesTypes.ToList();
+
             return Ok(new
             {
-                message = "EstatesType have been recived successfully",
-                totalResult = types.Count(),
-                result = types,
-                status = "success"
+                Message = "EstatesType have been recived successfully",
+                ResultCount = types.Count,
+                Result = types,
+                Status = "success"
             });
         }
 
         //GET: api/EstatesType/GetEstatesTypeById
-        [Route("GetEstatesTypeById")]
+        //Gets a type by its id
+        [Route("GetEstateTypeById")]
         [HttpGet]
-        public IHttpActionResult GetEstatesTypeById(string id)
+        public IHttpActionResult GetEstateTypeById(string id)
         {
             if (id == null)
-                return BadRequest("Please enter a valid ID");
+                return BadRequest("Please enter a valid Id");
 
             var type = db.EstatesTypes.Find(id);
 
@@ -43,51 +48,52 @@ namespace Estates.Controllers
 
             return Ok(new
             {
-                message = "Type has recived successfully",
-                result = new
-                {
-                    type.EstatesTypeName,
-                    type.AddedDate,
-                    Items = type.Items.Select(i => i.ItemId)
-                },
-                status = "success"
+                Message = "Type has recived successfully",
+                Result = type,
+                Status = "success"
             });
         }
 
-        //GET: api/EstatesType/AddNewEstatesType
-        [Route("AddNewEstatesType")]
+        #endregion
+
+        #region POST
+        //POST: api/EstatesType/AddNewEstatesType
+        //Adds a new estate type
+        [Route("AddNewEstateType")]
         [HttpPost]
-        public IHttpActionResult AddNewEstatesType(EstatesTypeViewModel model)
+        public IHttpActionResult AddNewEstateType(EstatesTypeViewModel model)
         {
-            var types = db.EstatesTypes.Find(model.TypeName.Trim());
+            var type = db.EstatesTypes.Find(model.TypeName.Trim());
 
-            if (types == null)
-                return BadRequest("This Types of Estate's is allredy faound");
-
-
+            if (type != null)
+                return BadRequest("Estate type already exists!");
 
             if (ModelState.IsValid)
             {
-                EstatesType type = new EstatesType
+                EstatesType estateType = new EstatesType
                 {
                     EstatesTypeId = Guid.NewGuid().ToString(),
                     EstatesTypeName = model.TypeName.Trim(),
                     AddedDate = DateTime.UtcNow
                 };
 
-                db.EstatesTypes.Add(type);
+                db.EstatesTypes.Add(estateType);
                 db.SaveChanges();
 
                 return Ok(new
                 {
-                    message = "Type has been added successfully",
-                    result = type,
-                    status = "success"
+                    Message = "Type has been added successfully",
+                    Result = estateType,
+                    Status = "success"
                 });
             }
 
             return BadRequest("Some properties are not valid");
         }
+
+        #endregion
+
+        #region PUT
         //PUT: api/EstatesType/EditEstateType
         //Update EstateType
         [HttpPut]
@@ -102,19 +108,25 @@ namespace Estates.Controllers
             if (ModelState.IsValid)
             {
                 oldType.EstatesTypeName = model.EstatesTypeName.Trim();
+                
                 db.SaveChanges();
 
                 return Ok(new
                 {
-                    message = "Estate Type has been updated!",
-                    status = "success"
+                    Message = "Estate Type has been updated!",
+                    Status = "success"
                 });
             }
 
             return BadRequest("Some Properties are not valid!");
         }
+
+        #endregion
+
+        #region DELETE
+
         //DELETE: api/EstatesType/DeleteEstatesType
-        //Delete all child
+        //Delete an estate type by id
         [Route("DeleteEstatesType")]
         [HttpDelete]
         public IHttpActionResult DeleteEstatesType(string id)
@@ -132,11 +144,13 @@ namespace Estates.Controllers
 
             return Ok(new
             {
-                message = "EstateType has removed successfully",
-                status = "success"
+                Message = "EstateType has been removed successfully",
+                Status = "success"
 
             });
 
         }
+
+        #endregion  
     }
 }

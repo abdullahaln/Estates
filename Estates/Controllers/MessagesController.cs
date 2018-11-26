@@ -12,6 +12,7 @@ namespace Estates.Controllers
     public class MessagesController : ApiController
     {
         ApplicationDbContext db = new ApplicationDbContext();
+
         //GET: api/Messages/GetAllMessages    
         //Specially for adminstrater
         [Route("GetAllMessages")]
